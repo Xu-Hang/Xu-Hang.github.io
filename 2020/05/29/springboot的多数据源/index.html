@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>springboot的多数据源 | xuhang-blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="springboot的多数据源 由于springboot使用自动配置使得应用开发更加容易,但是也带来了一些问题(如何改变原有配置) 下面就为基于多数据源配置分析  1.spring jdbc配置 由于springboot的自动配置已经自动为我们配置好了properties,所以我只要遵循它配置来进行配置就可以进行数据源的加载,下面我们可以看下DataSource和DataSourcePropert">
+<meta property="og:type" content="article">
+<meta property="og:title" content="springboot的多数据源">
+<meta property="og:url" content="http://yoursite.com/2020/05/29/springboot%E7%9A%84%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/index.html">
+<meta property="og:site_name" content="xuhang-blog">
+<meta property="og:description" content="springboot的多数据源 由于springboot使用自动配置使得应用开发更加容易,但是也带来了一些问题(如何改变原有配置) 下面就为基于多数据源配置分析  1.spring jdbc配置 由于springboot的自动配置已经自动为我们配置好了properties,所以我只要遵循它配置来进行配置就可以进行数据源的加载,下面我们可以看下DataSource和DataSourcePropert">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-05-29T02:59:04.905Z">
+<meta property="article:modified_time" content="2020-05-29T02:59:04.905Z">
+<meta property="article:author" content="xu">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="xuhang-blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">xuhang-blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-springboot的多数据源" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/29/springboot%E7%9A%84%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="article-date">
+  <time datetime="2020-05-29T02:59:04.905Z" itemprop="datePublished">2020-05-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      springboot的多数据源
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="springboot的多数据源"><a href="#springboot的多数据源" class="headerlink" title="springboot的多数据源"></a>springboot的多数据源</h1><blockquote>
+<p>由于springboot使用自动配置使得应用开发更加容易,但是也带来了一些问题(如何改变原有配置)</p>
+<p>下面就为基于多数据源配置分析</p>
+</blockquote>
+<h2 id="1-spring-jdbc配置"><a href="#1-spring-jdbc配置" class="headerlink" title="1.spring jdbc配置"></a>1.spring jdbc配置</h2><blockquote>
+<p>由于springboot的自动配置已经自动为我们配置好了properties,所以我只要遵循它配置来进行配置就可以进行数据源的加载,下面我们可以看下DataSource和DataSourceProperties的源码</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.springframework.boot.autoconfigure.jdbc;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Actual DataSource configurations imported by &#123;<span class="doctag">@link</span> DataSourceAutoConfiguration&#125;.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Dave Syer</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Phillip Webb</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Stephane Nicoll</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">   <span class="keyword">protected</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">createDataSource</span><span class="params">(DataSourceProperties properties,</span></span></span><br><span class="line"><span class="function"><span class="params">         Class&lt;? extends DataSource&gt; type)</span> </span>&#123;</span><br><span class="line">       <span class="comment">//该方法配置数据源配置</span></span><br><span class="line">      <span class="keyword">return</span> (T) properties.initializeDataSourceBuilder().type(type).build();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   ......</span><br><span class="line"></span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Hikari DataSource configuration.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * springboot默认连接池,所以关注这里代码</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="meta">@ConditionalOnClass</span>(HikariDataSource<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">   @<span class="title">ConditionalOnMissingBean</span>(<span class="title">DataSource</span>.<span class="title">class</span>)</span></span><br><span class="line"><span class="class">   @<span class="title">ConditionalOnProperty</span>(<span class="title">name</span> </span>= <span class="string">"spring.datasource.type"</span>, havingValue = <span class="string">"com.zaxxer.hikari.HikariDataSource"</span>, matchIfMissing = <span class="keyword">true</span>)</span><br><span class="line">   <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Hikari</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Bean</span></span><br><span class="line">      <span class="meta">@ConfigurationProperties</span>(prefix = <span class="string">"spring.datasource.hikari"</span>)</span><br><span class="line">      <span class="function"><span class="keyword">public</span> HikariDataSource <span class="title">dataSource</span><span class="params">(DataSourceProperties properties)</span> </span>&#123;</span><br><span class="line">          <span class="comment">//加载properties到HikariDataSource</span></span><br><span class="line">         HikariDataSource dataSource = createDataSource(properties,</span><br><span class="line">               HikariDataSource<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">         <span class="keyword">if</span> (StringUtils.hasText(properties.getName())) &#123;</span><br><span class="line">            dataSource.setPoolName(properties.getName());</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">return</span> dataSource;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   ......</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>细节不展开,由上可以看出数据源的配置加载是DataSourceProperties,至于为啥是HikariDataSource跟autoconfig代码</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.springframework.boot.autoconfigure.jdbc;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Base class for configuration of a data source.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Dave Syer</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Maciej Walkowiak</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Stephane Nicoll</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Benedikt Ritter</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Eddú Meléndez</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 1.1.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">//查看对应配置文件</span></span><br><span class="line"><span class="meta">@ConfigurationProperties</span>(prefix = <span class="string">"spring.datasource"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceProperties</span> <span class="keyword">implements</span> <span class="title">BeanClassLoaderAware</span>, <span class="title">InitializingBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      .....</span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Initialize a &#123;<span class="doctag">@link</span> DataSourceBuilder&#125; with the state of this instance.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> a &#123;<span class="doctag">@link</span> DataSourceBuilder&#125; initialized with the customizations defined on</span></span><br><span class="line"><span class="comment">	 * this instance 初始化数据源</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> DataSourceBuilder&lt;?&gt; initializeDataSourceBuilder() &#123;</span><br><span class="line">		<span class="keyword">return</span> DataSourceBuilder.create(getClassLoader()).type(getType())</span><br><span class="line">				.driverClassName(determineDriverClassName()).url(determineUrl())</span><br><span class="line">				.username(determineUsername()).password(determinePassword());</span><br><span class="line">	&#125;</span><br><span class="line">    .......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>``</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class DataSourceBuilder 中的方法:</span><br><span class="line"></span><br><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   Class&lt;? extends DataSource&gt; type = getType();</span><br><span class="line">   <span class="comment">//spring初始化一个bean</span></span><br><span class="line">   DataSource result = BeanUtils.instantiateClass(type);</span><br><span class="line">   maybeGetDriverClassName();</span><br><span class="line">   <span class="comment">//绑定属性</span></span><br><span class="line">   bind(result);</span><br><span class="line">   <span class="keyword">return</span> (T) result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>从上面代码可以出配置文件中的配置是设置到了DataSourceProperties.</p>
+<p>配置文件配置如下:</p>
+</blockquote>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span> </span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">reporting:</span> </span><br><span class="line">      <span class="attr">driver-class-name:</span> <span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line">      <span class="attr">jdbc-url:</span> <span class="string">jdbc:mysql://reporting:3306/REPORTING?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=GMT%2b8&amp;useSSL=false</span></span><br><span class="line">      <span class="attr">username:</span> </span><br><span class="line">      <span class="attr">password:</span> </span><br><span class="line">      </span><br><span class="line">    <span class="attr">logging:</span> </span><br><span class="line">      <span class="attr">driver-class-name:</span> <span class="string">com.mysql.cj.jdbc.Driver</span></span><br><span class="line">      <span class="attr">jdbc-url:</span> <span class="string">jdbc:mysql://logging:3306/REPORTING?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=GMT%2b8&amp;useSSL=false</span></span><br><span class="line">      <span class="attr">username:</span> </span><br><span class="line">      <span class="attr">password:</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们使用JdbcTemplate,需要看一下实现</p>
+</blockquote>
+<p>``</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> EnableAutoConfiguration Auto-configuration&#125; for &#123;<span class="doctag">@link</span> JdbcTemplate&#125; and</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> NamedParameterJdbcTemplate&#125;.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Dave Syer</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Phillip Webb</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Stephane Nicoll</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Kazuki Shimizu</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 1.4.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnClass</span>(&#123; DataSource<span class="class">.<span class="keyword">class</span>, <span class="title">JdbcTemplate</span>.<span class="title">class</span> &#125;)</span></span><br><span class="line"><span class="class">@<span class="title">ConditionalOnSingleCandidate</span>(<span class="title">DataSource</span>.<span class="title">class</span>)</span></span><br><span class="line"><span class="class">@<span class="title">AutoConfigureAfter</span>(<span class="title">DataSourceAutoConfiguration</span>.<span class="title">class</span>)</span></span><br><span class="line"><span class="class">@<span class="title">EnableConfigurationProperties</span>(<span class="title">JdbcProperties</span>.<span class="title">class</span>)</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">class</span> <span class="title">JdbcTemplateAutoConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Configuration</span></span><br><span class="line">   <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">final</span> DataSource dataSource;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">final</span> JdbcProperties properties;</span><br><span class="line"></span><br><span class="line">      JdbcTemplateConfiguration(DataSource dataSource, JdbcProperties properties) &#123;</span><br><span class="line">         <span class="keyword">this</span>.dataSource = dataSource;</span><br><span class="line">         <span class="keyword">this</span>.properties = properties;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Bean</span></span><br><span class="line">      <span class="meta">@Primary</span></span><br><span class="line">      <span class="meta">@ConditionalOnMissingBean</span>(JdbcOperations<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">      <span class="title">public</span> <span class="title">JdbcTemplate</span> <span class="title">jdbcTemplate</span>() </span>&#123;</span><br><span class="line">          <span class="comment">//可以看出spring采用这个构造器初始化</span></span><br><span class="line">         JdbcTemplate jdbcTemplate = <span class="keyword">new</span> JdbcTemplate(<span class="keyword">this</span>.dataSource);</span><br><span class="line">         JdbcProperties.Template template = <span class="keyword">this</span>.properties.getTemplate();</span><br><span class="line">         jdbcTemplate.setFetchSize(template.getFetchSize());</span><br><span class="line">         jdbcTemplate.setMaxRows(template.getMaxRows());</span><br><span class="line">         <span class="keyword">if</span> (template.getQueryTimeout() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            jdbcTemplate</span><br><span class="line">                  .setQueryTimeout((<span class="keyword">int</span>) template.getQueryTimeout().getSeconds());</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">return</span> jdbcTemplate;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">  .....</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplate</span> <span class="keyword">extends</span> <span class="title">JdbcAccessor</span> <span class="keyword">implements</span> <span class="title">JdbcOperations</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">JdbcTemplate</span><span class="params">(DataSource dataSource)</span> </span>&#123;</span><br><span class="line">      setDataSource(dataSource);</span><br><span class="line">      afterPropertiesSet();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//由上面可以看出初始化时数据源配置也加入了</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//配置读取配置文件</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name=<span class="string">"reportingDataSource"</span>)</span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"reportingDataSource"</span>)</span><br><span class="line">    <span class="meta">@RefreshScope</span></span><br><span class="line">    <span class="meta">@Primary</span> <span class="comment">//需要加上这个为默认配置选择数据源</span></span><br><span class="line">    <span class="meta">@ConfigurationProperties</span>(prefix=<span class="string">"spring.datasource.reporting"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> DataSource <span class="title">reportingDataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> DataSourceBuilder.create().build();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Bean</span>(name=<span class="string">"loggingDataSource"</span>)</span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"loggingDataSource"</span>)</span><br><span class="line">    <span class="meta">@RefreshScope</span></span><br><span class="line">    <span class="meta">@ConfigurationProperties</span>(prefix=<span class="string">"spring.datasource.logging"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> DataSource <span class="title">loggingDataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> DataSourceBuilder.create().build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>所以我需要设置自己DataSourceProperties来配置自己的数据源,现在有了两个DataSource的bean</p>
+<p>现在需要将这两个bean分别设置到自己的对应JdbcTemplate的bean中</p>
+</blockquote>
+<p>``</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateConfig</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"reportingJdbcTemplate"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> JdbcTemplate <span class="title">reportingJdbcTemplate</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @Qualifier(<span class="string">"reportingDataSource"</span>)</span> DataSource dataSource) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> JdbcTemplate(dataSource);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"loggingJdbcTemplate"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> JdbcTemplate <span class="title">loggingJdbcTemplate</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @Qualifier(<span class="string">"loggingDataSource"</span>)</span> DataSource dataSource) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> JdbcTemplate(dataSource);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>设置完成,通过不同的JdbcTemplate便可使用</p>
+</blockquote>
+<h2 id="jpa设置多数据源"><a href="#jpa设置多数据源" class="headerlink" title="jpa设置多数据源"></a>jpa设置多数据源</h2><blockquote>
+<p>由上可以知道设置jpa多数据源需要定位到使用的数据源的bean,然后设置替换</p>
+</blockquote>
+<h2 id="疑问"><a href="#疑问" class="headerlink" title="疑问???"></a>疑问???</h2><blockquote>
+<p>jpa设置多数据源是,采用<code>DruidDataSource</code>时,默认配置引入存在问题,具体得先研究jpa代码</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/05/29/springboot%E7%9A%84%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" data-id="ckarmgt9t0000hzxg2ynwhcy6" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/05/29/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/05/29/springboot%E7%9A%84%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/">springboot的多数据源</a>
+          </li>
+        
+          <li>
+            <a href="/2020/05/29/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 xu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
